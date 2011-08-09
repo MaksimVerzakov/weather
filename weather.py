@@ -17,7 +17,7 @@ class Weather(object):
     Google Weather API.    
     """
     def __init__(self, city):
-        self.city = city             
+        self.city = city          
 
     def get_weather(self):
         """Send GET request to Google Weather API.         
@@ -48,7 +48,15 @@ class Weather(object):
         condition = {}
         for tag in structure:
             condition[tag] = self._getData(nodelist, tag)
-        self.result.callback(condition)
+        self.result.callback(self.toStr(condition))
+    
+    def toStr(self, weather_condition):
+        w = weather_condition
+        cond = 'condition: %s' % w['condition']
+        temp = 'temperature: %s F, %s C' % (w['temp_f'], w['temp_c'])
+        hum = 'humidity: %s' % w['humidity']
+        wind = 'wind: %s' % w['wind_condition']
+        return '%s\n%s\n%s\n%s\n' % (cond, temp, hum, wind)
         
         
 def Res(x):
