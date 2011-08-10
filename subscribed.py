@@ -5,7 +5,10 @@ class SubscribedList(object):
         self.read_subscribed_list()
         
     def read_subscribed_list(self):
-        subscr = open(self.filename, 'w+') 
+        try:
+            subscr = open(self.filename) 
+        except IOError:
+            subscr = open(self.filename, 'w+')              
         for line in subscr.readlines():
             line = line.strip()
             k, v = line.split(' ', 1)
@@ -15,7 +18,7 @@ class SubscribedList(object):
         
     def add_subscr(self, from_, to):
         from_ = unicode(from_)
-        to = unicode(to_)
+        to = unicode(to)
         if (from_, to) in self.subscr_list:
             return
         self.subscr_list.append((from_, to))
@@ -25,7 +28,9 @@ class SubscribedList(object):
     
     def rm_subscr(self, from_, to):
         from_ = unicode(from_)
-        to = unicode(to_)
+        to = unicode(to)
+        if (from_, to) not in self.subscr_list:
+            return
         self.subscr_list.remove((from_, to))
         subscr = open(self.filename, 'w')
         for from_, to in self.subscr_list:

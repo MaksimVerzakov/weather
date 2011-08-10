@@ -40,7 +40,7 @@ class Weather(object):
         xml = parseString(respond)
         weather_info = xml.getElementsByTagName('weather')[0]
         if weather_info.getElementsByTagName('problem_cause'):
-            self.result.errback(UnknownCityException('unknown city'))
+            self.result.errback(UnknownCityException('Unknown city'))
             return           
         nodelist = weather_info.getElementsByTagName('current_conditions')[0]
         structure = ('condition','temp_f', 'temp_c', 'humidity',

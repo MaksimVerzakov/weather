@@ -13,16 +13,7 @@ class WeatherBase(object):
         self.lc.start(900)
 
     def _add_city(self, city):
-        self.cities[city] = Weather(city)
-        weather = self.cities[city].get_weather()
-        weather.addCallback(self._received_condition, city)
-        weather.addErrback(self._received_error, city)        
-    
-    def _received_condition(self, condition, city):
-        self.conditions[city] = condition
-    
-    def _received_error(self, failure, city):
-        print 'Error %s' % failure
+        self.cities[city] = Weather(city)        
             
     def get_condition(self, city):
         d = defer.Deferred()

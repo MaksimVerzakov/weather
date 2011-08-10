@@ -14,12 +14,10 @@ from twisted.words.protocols.jabber import component
 from twisted.internet import reactor
 from twisted.scripts import _twistd_unix as twistd
 
-#from ossignal import install_shutdown_handlers
 import gweather
 
 def main():
     version = "0.1"
-
     from optparse import OptionParser
     parser = OptionParser(version=
                           "Habahaba-ng component version:" + version)
@@ -38,7 +36,7 @@ def main():
     else:
         config.read('weather.conf')
     if configBackground and os.name == "posix": # daemons supported?
-        twistd.daemonize() # send to background
+        twistd.daemonize()
     try:
         pid_file = config.get('process', 'pid', None)
     except:
@@ -60,8 +58,7 @@ def main():
                                      "tcp:%s:%s" % (host, port))
     c.setServiceParent(connector)
     connector.startService()
-    #install_shutdown_handlers(c.shuttingDown)
-    reactor.run() #installSignalHandlers=False)
+    reactor.run() 
 
 if __name__ == "__main__":
     main()
