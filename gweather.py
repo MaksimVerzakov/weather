@@ -28,7 +28,7 @@ class WeatherComponent(component.Service):
         self.cJid = internJID(cJid)
         self.startTime = None
         self.xmlstream = None
-        self.suscribed = SubscribedList(self.config.get('component', 'basepath'))
+        self.subscribed = SubscribedList(config)
         self.wbase = WeatherBase()
         self.online = []   
         
@@ -40,14 +40,14 @@ class WeatherComponent(component.Service):
         self.dispatcher.registerHandler((Message, self))
         self.getOnline()
         self.lc = task.LoopingCall(self.updateStatus)
-        self.lc.start(60)
+        self.lc.start(900)
         print 'Connected'
 
     def addSubscr(self, from_, to):
-        self.suscribed.add_subscr(unicode(from_), unicode(to))
+        self.subscribed.add_subscr(from_, to)
     
     def rmSubscr(self, from_, to):
-        self.suscribed.rm_subscr(unicode(from_), unicode(to))
+        self.subscribed.rm_subscr(from_, to)
     
     def addOnlinesubscr(self, from_, to):
         self.online.append((from_, to))
@@ -56,7 +56,7 @@ class WeatherComponent(component.Service):
         self.online.remove((from_, to))
     
     def getOnline(self):
-        for from_, to in self.suscribed.subscr_list:
+        for from_, to in self.subscribed.subscr_list:
             reply = Presence(
                           to=from_,
                           from_=to,

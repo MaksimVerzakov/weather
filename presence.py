@@ -43,6 +43,7 @@ class MyPresence(Presence):
         return EmptyStanza()
             
     def unsubscribeHandler(self):
+        print 'unsubscr'
         reply = Presence(
                           to=self.from_,
                           from_=self.to,

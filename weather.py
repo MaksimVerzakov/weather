@@ -52,7 +52,6 @@ class Weather(object):
         self.result.callback(self.toUnicode(condition))
     
     def toUnicode(self, weather_condition):
-        print 'to Unicode'
         w = weather_condition
         cond = u'condition: %s' % w['condition']
         temp = u'temperature: %s F, %s C' % (w['temp_f'], w['temp_c'])

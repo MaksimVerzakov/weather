@@ -10,7 +10,7 @@ class WeatherBase(object):
         self.cities = {}
         self.conditions = {}
         self.lc = task.LoopingCall(self.update)
-        self.lc.start(150)
+        self.lc.start(900)
 
     def _add_city(self, city):
         self.cities[city] = Weather(city)
@@ -36,4 +36,4 @@ class WeatherBase(object):
         
     def update(self):
         for city in self.cities:
-            self.cities[city].get_weather().addCallback(_received_condition, city)
+            self.cities[city].get_weather().addCallback(self._received_condition, city)

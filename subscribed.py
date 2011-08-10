@@ -1,11 +1,11 @@
 class SubscribedList(object):
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, config):
+        self.filename = config.get('component', 'basepath')
         self.subscr_list = []
         self.read_subscribed_list()
         
     def read_subscribed_list(self):
-        subscr = open(self.filename) 
+        subscr = open(self.filename, 'w+') 
         for line in subscr.readlines():
             line = line.strip()
             k, v = line.split(' ', 1)
@@ -14,6 +14,8 @@ class SubscribedList(object):
         return self.subscr_list
         
     def add_subscr(self, from_, to):
+        from_ = unicode(from_)
+        to = unicode(from_)
         if (from_, to) in self.subscr_list:
             return
         self.subscr_list.append((from_, to))
@@ -22,6 +24,8 @@ class SubscribedList(object):
         subscr.close()
     
     def rm_subscr(self, from_, to):
+        from_ = unicode(from_)
+        to = unicode(from_)
         self.subscr_list.remove((from_, to))
         subscr = open(self.filename, 'w')
         for from_, to in self.subscr_list:
