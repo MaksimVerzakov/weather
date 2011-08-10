@@ -2,7 +2,7 @@
 import os
 
 import twisted.web.client
-from twisted.internet import reactor, task
+from twisted.internet import task
 from twisted.internet import defer
 from xml.dom.minidom import parseString
 
@@ -31,8 +31,7 @@ class Weather(object):
         return self.result
             
     def _received_error(self, failure):
-        self.result.errback(GoogleException(failure))
-        print 'gerror %' % failure
+        self.result.errback(GoogleException(failure))        
 
     def _getData(self, nodelist, tag):
         return nodelist.getElementsByTagName(tag)[0].getAttribute('data')
@@ -58,14 +57,3 @@ class Weather(object):
         hum = u'humidity: %s' % w['humidity']
         wind = u'wind: %s' % w['wind_condition']
         return u'%s\n%s\n%s\n%s\n' % (cond, temp, hum, wind)
-        
-        
-def Res(x):
-    print x
-
-if __name__ == '__main__':
-    condition1 = Weather('omsk')
-    condition1 = condition1.get_weather()
-    condition1.addCallback(Res)        
-    reactor.run()
-    

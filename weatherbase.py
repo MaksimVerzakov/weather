@@ -22,10 +22,9 @@ class WeatherBase(object):
         self.conditions[city] = condition
     
     def _received_error(self, failure, city):
-        print 'error %s' % failure
-    
+        print 'Error %s' % failure
+            
     def get_condition(self, city):
-        print city
         d = defer.Deferred()
         if city in self.conditions.keys():            
             d.callback(self.conditions[city])            

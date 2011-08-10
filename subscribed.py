@@ -15,7 +15,7 @@ class SubscribedList(object):
         
     def add_subscr(self, from_, to):
         from_ = unicode(from_)
-        to = unicode(from_)
+        to = unicode(to_)
         if (from_, to) in self.subscr_list:
             return
         self.subscr_list.append((from_, to))
@@ -25,7 +25,7 @@ class SubscribedList(object):
     
     def rm_subscr(self, from_, to):
         from_ = unicode(from_)
-        to = unicode(from_)
+        to = unicode(to_)
         self.subscr_list.remove((from_, to))
         subscr = open(self.filename, 'w')
         for from_, to in self.subscr_list:

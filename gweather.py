@@ -50,10 +50,12 @@ class WeatherComponent(component.Service):
         self.subscribed.rm_subscr(from_, to)
     
     def addOnlinesubscr(self, from_, to):
-        self.online.append((from_, to))
+        if (from_, to) not in self.online:
+            self.online.append((from_, to))
             
     def rmOnlinesubscr(self, from_, to):
-        self.online.remove((from_, to))
+        if (from_, to) in self.online:
+            self.online.remove((from_, to))
     
     def getOnline(self):
         for from_, to in self.subscribed.subscr_list:
@@ -75,3 +77,4 @@ class WeatherComponent(component.Service):
                           from_=to,
                           status=respond,                          
                         )
+        self.xmlstream.send(reply)
