@@ -53,6 +53,7 @@ def main():
     password = config.get('component', 'password')
     host = config.get('component', 'host')
     port = config.get('component', 'port')
+    path = config.get('component', 'basepath')
     c = gweather.WeatherComponent(reactor, version, config, jid)
     f = component.componentFactory(jid, password)
     connector = component.buildServiceManager(jid, password,

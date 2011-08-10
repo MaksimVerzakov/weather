@@ -15,14 +15,14 @@ class WeatherBase(object):
     def _add_city(self, city):
         self.cities[city] = Weather(city)
         weather = self.cities[city].get_weather()
-        weather.addCallback(self._recived_condition, city)
-        weather.addErrback(self._recived_error, city)        
+        weather.addCallback(self._received_condition, city)
+        weather.addErrback(self._received_error, city)        
     
-    def _recived_condition(self, condition, city):
+    def _received_condition(self, condition, city):
         self.conditions[city] = condition
     
-    def _recived_error(self, condition, city):
-        del self.cities[city]
+    def _received_error(self, failure, city):
+        print 'error %s' % failure
     
     def get_condition(self, city):
         print city
@@ -36,4 +36,4 @@ class WeatherBase(object):
         
     def update(self):
         for city in self.cities:
-            self.cities[city].get_weather().addCallback(_recived_condition, city)   
+            self.cities[city].get_weather().addCallback(_received_condition, city)

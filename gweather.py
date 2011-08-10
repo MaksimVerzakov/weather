@@ -1,6 +1,7 @@
 import time
 import os
 
+from twisted.internet import task
 from twisted.internet.defer import Deferred
 from twisted.words.xish import domish,xpath
 from twisted.words.xish.domish import Element
@@ -27,8 +28,9 @@ class WeatherComponent(component.Service):
         self.cJid = internJID(cJid)
         self.startTime = None
         self.xmlstream = None
-        self.suscribed = SubscribedList(os.path.dirname(__file__) + '/subscribed.txt')
-        self.wbase = WeatherBase()        
+        self.suscribed = SubscribedList(self.config.get('component', 'basepath'))
+        self.wbase = WeatherBase()
+        self.online = []   
         
     def componentConnected(self, xs):
         self.startTime = time.time()
@@ -36,24 +38,40 @@ class WeatherComponent(component.Service):
         self.dispatcher = Dispatcher(xs, self.cJid)
         self.dispatcher.registerHandler((MyPresence, self))
         self.dispatcher.registerHandler((Message, self))
+        self.getOnline()
+        self.lc = task.LoopingCall(self.updateStatus)
+        self.lc.start(60)
         print 'Connected'
 
     def addSubscr(self, from_, to):
-        self.suscribed.add_subscr(from_, to)
+        self.suscribed.add_subscr(unicode(from_), unicode(to))
     
     def rmSubscr(self, from_, to):
-        self.suscribed.rm_subscr(from_, to)
+        self.suscribed.rm_subscr(unicode(from_), unicode(to))
+    
+    def addOnlinesubscr(self, from_, to):
+        self.online.append((from_, to))
+            
+    def rmOnlinesubscr(self, from_, to):
+        self.online.remove((from_, to))
+    
+    def getOnline(self):
+        for from_, to in self.suscribed.subscr_list:
+            reply = Presence(
+                          to=from_,
+                          from_=to,
+                          type_='probe',                          
+                        )
+            self.xmlstream.send(reply)
     
     def updateStatus(self):
-        els = []
-        for from_, to in self.subscribed.subscr_list:
-            els.append(Presence(to=self.from_,
-                                from_=self.to,
-                                type_='available',
-                                status='')
-                      )
-        
-
-if __name__ == '__main__':
-    print "start main.py"
-    sys.exit(0)
+        for from_, to in self.online:
+            deff = self.wbase.get_condition(to.user)
+            deff.addCallback(self._result, from_, to)
+    
+    def _result(self, respond, from_, to):
+        reply = Presence(
+                          to=from_,
+                          from_=to,
+                          status=respond,                          
+                        )
