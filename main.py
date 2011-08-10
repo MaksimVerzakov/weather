@@ -17,36 +17,8 @@ from twisted.scripts import _twistd_unix as twistd
 import gweather
 
 def main():
-    version = "0.1"
-    from optparse import OptionParser
-    parser = OptionParser(version=
-                          "Habahaba-ng component version:" + version)
-    parser.add_option('-c', '--config', metavar='FILE', dest='configFile',
-                      help="Read config from custom file")
-    parser.add_option('-b', '--background', dest='configBackground',
-                      help="Daemonize/background transport",
-                      action="store_true")
-    (options,args) = parser.parse_args()
-    configFile = options.configFile
-    configBackground = options.configBackground
-
     config = ConfigParser.ConfigParser()
-    if configFile:
-        config.read(configFile)
-    else:
-        config.read('weather.conf')
-    if configBackground and os.name == "posix": # daemons supported?
-        twistd.daemonize()
-    try:
-        pid_file = config.get('process', 'pid', None)
-    except:
-        pid_file = None
-    if pid_file:
-        pid = str(os.getpid())
-        pidfile = open(pid_file, "w")
-        pidfile.write("%s\n" % pid)
-        pidfile.close()
-
+    config.read('weather.conf')
     jid = config.get('component', 'jid')
     password = config.get('component', 'password')
     host = config.get('component', 'host')

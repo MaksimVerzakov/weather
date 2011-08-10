@@ -13,7 +13,14 @@ class MyPresence(Presence):
         deff.addErrback(self.error)
         return EmptyStanza()
        
-    def subscribeHandler(self):
+    def subscribeHandler(self):        
+        deff = self.host.wbase.get_condition(self.to.user)
+        deff.addCallback(self.received_condition)
+        deff.addErrback(self.error)
+        return EmptyStanza()
+    
+    def received_condition(self, condition):
+        print 'received'
         reply1 = Presence(
                           to=self.from_,
                           from_=self.to,
@@ -24,10 +31,12 @@ class MyPresence(Presence):
                           from_=self.to,
                           type_='subscribe',                          
                         )
-        deff = self.host.wbase.get_condition(self.to.user)
-        deff.addCallback(self.result, 'available')
-        deff.addErrback(self.error)
-        return (reply1, reply2)
+        reply3 = Presence(
+                          to=self.from_,
+                          from_=self.to,
+                          type_='subscribe',                          
+                        )
+        self.host.dispatcher.send((reply1, reply2, reply3))
     
     def subscribedHandler(self):
         self.host.addSubscr(self.from_, self.to)
@@ -60,7 +69,21 @@ class MyPresence(Presence):
                           type_=type,
                           status = respond,
                         )
-        self.host.xmlstream.send(reply)
+        self.host.dispatcher.send(reply)
     
     def error(self, err):
-        self.result(err.getErrorMessage(), 'unavailable')
+        fail = err.trap(UnknownCityException, GoogleException)
+        if fail == UnknownCityException:
+            reply = Presence(
+                             to=self.from_,
+                             from_=self.to,
+                             type_='unsubscribed',                          
+                            )
+            self.host.dispatcher.send(reply)
+        if fail == GoogleException:
+            reply = Presence(
+                             to=self.from_,
+                             from_=self.to,
+                             type_='error',                          
+                            )
+            self.host.dispatcher.send(reply)
