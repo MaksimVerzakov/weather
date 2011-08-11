@@ -3,7 +3,7 @@
 #
 # copyright 2011 Verzakov Maxim aka xam_vz 
 #
-# License: GPL-v3kiev
+# License: GPL-v3
 #
 import ConfigParser
 
