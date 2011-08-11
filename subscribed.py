@@ -2,9 +2,9 @@ class SubscribedList(object):
     def __init__(self, config):
         self.filename = config.get('component', 'basepath')
         self.subscr_list = []
-        self.read_subscribed_list()
+        self._read_subscribed_list()
         
-    def read_subscribed_list(self):
+    def _read_subscribed_list(self):
         try:
             subscr = open(self.filename) 
         except IOError:

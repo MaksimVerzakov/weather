@@ -15,7 +15,7 @@ class MyPresence(Presence):
             condition = yield self.host.wbase.get_condition(self.to.user)
             type = 'available'
         except (UnknownCityException, GoogleException) as err:
-            condition, type = self.error(err)           
+            condition, type = self._error(err)           
                
         reply = Presence(
                           to=self.from_,
@@ -47,7 +47,7 @@ class MyPresence(Presence):
                         )
             reply = (reply1, reply2, reply3)
         except (UnknownCityException, GoogleException) as err:
-            condition, type = self.error(err)
+            condition, type = self._error(err)
             reply = Presence(
                           to=self.from_,
                           from_=self.to,
@@ -66,7 +66,7 @@ class MyPresence(Presence):
             condition = yield self.host.wbase.get_condition(self.to.user)
             type = 'available'
         except (UnknownCityException, GoogleException) as err:
-            condition, type = self.error(err)
+            condition, type = self._error(err)
         reply = Presence(
                           to=self.from_,
                           from_=self.to,
@@ -88,7 +88,7 @@ class MyPresence(Presence):
         self.host.rmSubscr(self.from_, self.to)
         return EmptyStanza()
     
-    def error(self, err):
+    def _error(self, err):
         condition = ''
         if isinstance(err, UnknownCityException):
             type='unsubscribed'

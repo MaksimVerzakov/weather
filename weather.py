@@ -45,9 +45,9 @@ class Weather(object):
         condition = {}
         for tag in structure:
             condition[tag] = self._getData(nodelist, tag)
-        self.result.callback(self.toUnicode(condition))
+        self.result.callback(self._toUnicode(condition))
     
-    def toUnicode(self, weather_condition):
+    def _toUnicode(self, weather_condition):
         w = weather_condition
         cond = u'condition: %s' % w['condition']
         temp = u'temperature: %s F, %s C' % (w['temp_f'], w['temp_c'])
