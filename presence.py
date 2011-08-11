@@ -1,3 +1,5 @@
+from twisted.internet.defer import inlineCallbacks, returnValue
+
 from twilix.stanzas import Presence
 from twilix.base import WrongElement, EmptyStanza
 
@@ -7,47 +9,71 @@ from weather import GoogleException
 
 class MyPresence(Presence):
     
+    @inlineCallbacks
     def probeHandler(self):
-        deff = self.host.wbase.get_condition(self.to.user)
-        deff.addCallback(self.result, 'available')
-        deff.addErrback(self.error)
-        return EmptyStanza()
-       
-    def subscribeHandler(self):        
-        deff = self.host.wbase.get_condition(self.to.user)
-        deff.addCallback(self.received_condition)
-        deff.addErrback(self.error)
-        return EmptyStanza()
+        try:
+            condition = yield self.host.wbase.get_condition(self.to.user)
+            type = 'available'
+        except (UnknownCityException, GoogleException) as err:
+            condition, type = self.error(err)           
+               
+        reply = Presence(
+                          to=self.from_,
+                          from_=self.to,
+                          type_=type,
+                          status = condition,
+                        )
+        returnValue(reply)
     
-    def received_condition(self, condition):
-        print 'received'
-        reply1 = Presence(
+    @inlineCallbacks   
+    def subscribeHandler(self):
+        try:
+            condition = yield self.host.wbase.get_condition(self.to.user)
+            reply1 = Presence(
                           to=self.from_,
                           from_=self.to,
                           type_='subscribed',                          
                         )
-        reply2 = Presence(
+            reply2 = Presence(
                           to=self.from_,
                           from_=self.to,
                           type_='subscribe',                          
                         )
-        reply3 = Presence(
+            reply3 = Presence(
                           to=self.from_,
                           from_=self.to,
-                          type_='subscribe',                          
+                          type_='available',
+                          status = condition
                         )
-        self.host.dispatcher.send((reply1, reply2, reply3))
+            reply = (reply1, reply2, reply3)
+        except (UnknownCityException, GoogleException) as err:
+            condition, type = self.error(err)
+            reply = Presence(
+                          to=self.from_,
+                          from_=self.to,
+                          type_=type,                          
+                        )
+        returnValue(reply)
     
     def subscribedHandler(self):
         self.host.addSubscr(self.from_, self.to)
         return EmptyStanza()
 
+    @inlineCallbacks
     def availableHandler(self):
         self.host.addOnlinesubscr(self.from_, self.to)
-        deff = self.host.wbase.get_condition(self.to.user)
-        deff.addCallback(self.result, 'available')
-        deff.addErrback(self.error)
-        return EmptyStanza()
+        try:
+            condition = yield self.host.wbase.get_condition(self.to.user)
+            type = 'available'
+        except (UnknownCityException, GoogleException) as err:
+            condition, type = self.error(err)
+        reply = Presence(
+                          to=self.from_,
+                          from_=self.to,
+                          type_=type,
+                          status = condition,
+                        )
+        returnValue(reply)
         
     def unavailableHandler(self):
         self.host.rmOnlinesubscr(self.from_, self.to)
@@ -62,28 +88,10 @@ class MyPresence(Presence):
         self.host.rmSubscr(self.from_, self.to)
         return EmptyStanza()
     
-    def result(self, respond, type):
-        reply = Presence(
-                          to=self.from_,
-                          from_=self.to,
-                          type_=type,
-                          status = respond,
-                        )
-        self.host.dispatcher.send(reply)
-    
     def error(self, err):
-        fail = err.trap(UnknownCityException, GoogleException)
-        if fail == UnknownCityException:
-            reply = Presence(
-                             to=self.from_,
-                             from_=self.to,
-                             type_='unsubscribed',                          
-                            )
-            self.host.dispatcher.send(reply)
-        if fail == GoogleException:
-            reply = Presence(
-                             to=self.from_,
-                             from_=self.to,
-                             type_='error',                          
-                            )
-            self.host.dispatcher.send(reply)
+        condition = ''
+        if isinstance(err, UnknownCityException):
+            type='unsubscribed'
+        if isinstance(err, GoogleException):
+            type='error'
+        return (condition, type)

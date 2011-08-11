@@ -3,22 +3,20 @@
 #
 # copyright 2011 Verzakov Maxim aka xam_vz 
 #
-# License: GPL-v3
+# License: GPL-v3kiev
 #
-import getopt
-import os
-import sys
 import ConfigParser
 
 from twisted.words.protocols.jabber import component
 from twisted.internet import reactor
-from twisted.scripts import _twistd_unix as twistd
 
 import gweather
 
 def main():
+    version = '0.3'
     config = ConfigParser.ConfigParser()
     config.read('weather.conf')
+  
     jid = config.get('component', 'jid')
     password = config.get('component', 'password')
     host = config.get('component', 'host')

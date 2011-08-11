@@ -1,8 +1,5 @@
 # -*- coding: utf8 -*-
-import os
-
 import twisted.web.client
-from twisted.internet import task
 from twisted.internet import defer
 from xml.dom.minidom import parseString
 
