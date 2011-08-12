@@ -13,7 +13,7 @@ class MyPresence(Presence):
     def probeHandler(self):
         try:
             condition = yield self.host.wbase.get_condition(self.to.user)
-            type = 'available'
+            type = None
         except (UnknownCityException, GoogleException) as err:
             condition, type = self._error(err)           
                
@@ -41,8 +41,7 @@ class MyPresence(Presence):
                         )
             reply3 = Presence(
                           to=self.from_,
-                          from_=self.to,
-                          type_='available',
+                          from_=self.to,                          
                           status = condition
                         )
             reply = (reply1, reply2, reply3)
@@ -64,7 +63,7 @@ class MyPresence(Presence):
         self.host.addOnlinesubscr(self.from_, self.to)
         try:
             condition = yield self.host.wbase.get_condition(self.to.user)
-            type = 'available'
+            type = None
         except (UnknownCityException, GoogleException) as err:
             condition, type = self._error(err)
         reply = Presence(
