@@ -25,5 +25,10 @@ class WeatherBase(object):
         return d
         
     def _update(self):
+        def upt_error(city, err):
+            if isinstance(err, UnknownCityException):
+                self.cities.remove(city)
         for city in self.cities:
-            self.cities[city].get_weather().addCallback(self._received_condition, city)
+            d = self.cities[city].get_weather()
+            d.addCallback(self._received_condition, city)
+            d.addErrback(upt_error, city)
