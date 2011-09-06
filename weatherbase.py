@@ -11,7 +11,7 @@ class WeatherBase(object):
         self.cities = {}
         self.conditions = {}
         self.lc = task.LoopingCall(self._update)
-        self.lc.start(9)
+        self.lc.start(900)
 
     def _add_city(self, city):
         self.cities[city] = Weather(city)        
