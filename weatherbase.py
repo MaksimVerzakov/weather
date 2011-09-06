@@ -2,6 +2,7 @@ from twisted.internet import task
 from twisted.internet import defer
 
 from weather import Weather
+from weather import UnknownCityException
 
 
 class WeatherBase(object):
@@ -10,7 +11,7 @@ class WeatherBase(object):
         self.cities = {}
         self.conditions = {}
         self.lc = task.LoopingCall(self._update)
-        self.lc.start(900)
+        self.lc.start(9)
 
     def _add_city(self, city):
         self.cities[city] = Weather(city)        
@@ -18,7 +19,7 @@ class WeatherBase(object):
     def get_condition(self, city):
         d = defer.Deferred()
         if city in self.conditions.keys():            
-            d.callback(self.conditions[city])            
+            d.callback(self.conditions[city])
         else:
             self._add_city(city)
             d = Weather(city).get_weather()
@@ -32,3 +33,6 @@ class WeatherBase(object):
             d = self.cities[city].get_weather()
             d.addCallback(self._received_condition, city)
             d.addErrback(upt_error, city)
+    
+    def _received_condition(self, condition, city):
+        self.conditions[city] = condition

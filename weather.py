@@ -17,8 +17,7 @@ class Weather(object):
         self.city = city             
 
     def get_weather(self):
-        """Send GET request to Google Weather API.         
-        """
+        """Send GET request to Google Weather API."""
         self.result = defer.Deferred()
         deff = twisted.web.client.getPage(
             'http://www.google.com/ig/api?weather=%s' % str(self.city),

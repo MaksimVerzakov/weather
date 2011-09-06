@@ -49,7 +49,7 @@ Google Weather XMPP translation service')
         self.vcard.init(handlers=((WeatherVCardQuery, self.vcard),))
         self.getOnline()
         self.lc = task.LoopingCall(self.updateStatus)
-        self.lc.start(900)
+        self.lc.start(9)
         print 'Connected'
 
     def addSubscr(self, from_, to):
